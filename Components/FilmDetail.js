@@ -8,6 +8,8 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Share,
+  Platform,
 } from 'react-native';
 import moment from 'moment';
 import numeral from 'numeral';
@@ -16,7 +18,7 @@ import { getFilmDetailsFromApi, getImageFromApi } from '../API/TMDBApi';
 import ic_favorite from '../Images/ic_favorite.png';
 import ic_favorite_border from '../Images/ic_favorite_border.png';
 
-function FilmDetail({ route, dispatch, favoritesFilm }) {
+function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
   const { idFilm } = route.params;
 
   const [film, setFilm] = useState(undefined);
@@ -36,6 +38,22 @@ function FilmDetail({ route, dispatch, favoritesFilm }) {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (film !== undefined && Platform.OS === 'ios') {
+      navigation.setOptions({
+        headerRight: () => <TouchableOpacity
+            style={styles.shareTouchableHeaderRightButton}
+            onPress={shareFilm}
+          >
+            <Image
+              style={styles.shareImage}
+              source={require('../Images/ic_share.ios.png')}
+            />
+          </TouchableOpacity>
+      });
+    }
+  }, [film, navigation]);
 
   const displayLoading = () => {
     if(isLoading) {
@@ -59,6 +77,26 @@ function FilmDetail({ route, dispatch, favoritesFilm }) {
   const toggleFavorite = () => {
     const action = { type: 'TOGGLE_FAVORITE', value: film };
     dispatch(action);
+  };
+
+  const shareFilm = () => {
+    Share.share({title: film.title, message: film.overview});
+  };
+
+  const displayFloatingActionButton = () => {
+    if (film !== undefined && Platform.OS === 'android') {
+      return (
+        <TouchableOpacity
+          style={styles.shareTouchableFloatingActionButton}
+          onPress={shareFilm}
+        >
+          <Image
+            style={styles.shareImage}
+            source={require('../Images/ic_share.android.png')}
+          />
+        </TouchableOpacity>
+      );
+    }
   };
 
   const displayFilm = () => {
@@ -102,6 +140,7 @@ function FilmDetail({ route, dispatch, favoritesFilm }) {
     <View style={styles.mainContainer}>
       {displayLoading()}
       {displayFilm()}
+      {displayFloatingActionButton()}
     </View>
   );
 }
@@ -154,6 +193,24 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 5,
+  },
+  shareTouchableHeaderRightButton: {
+    marginRight: 8,
+  },
+  shareTouchableFloatingActionButton: {
+    position: 'absolute',
+    width: 60,
+    height: 60,
+    right: 30,
+    bottom: 30,
+    borderRadius: 30,
+    backgroundColor: '#e91e63',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  shareImage: {
+    width: 30,
+    height: 30,
   },
 });
 
