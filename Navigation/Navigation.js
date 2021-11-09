@@ -48,7 +48,7 @@ function Navigation() {
           tabBarShowLabel: false,
         }}
       >
-        <Tab.Screen name="Test" component={Test} />
+        {/* <Tab.Screen name="Test" component={Test} /> */}
         <Tab.Screen name="SearchTab"
           component={SearchStackScreen}
           options={{

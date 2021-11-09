@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Image, Text, TouchableOpacity } from 'react-native';
+import FadeIn from '../Animations/FadeIn';
 import { getImageFromApi } from '../API/TMDBApi';
 import ic_favorite from '../Images/ic_favorite.png'
 
@@ -18,28 +19,30 @@ export default function FilmItem({
   };
 
   return (
-    <TouchableOpacity
-      style={styles.mainContainer}
-      onPress={() => displayDetailForFilm(film.id)}
-    >
-      <Image
-        style={styles.image}
-        source={{uri: getImageFromApi(film.poster_path)}}
-      />
-      <View style={styles.contentContainer}>
-        <View style={styles.headerContainer}>
-          {displayFavoriteImage()}
-          <Text style={styles.titleText}>{film.title}</Text>
-          <Text style={styles.voteText}>{film.vote_average}</Text>
+    <FadeIn>
+      <TouchableOpacity
+        style={styles.mainContainer}
+        onPress={() => displayDetailForFilm(film.id)}
+      >
+        <Image
+          style={styles.image}
+          source={{uri: getImageFromApi(film.poster_path)}}
+        />
+        <View style={styles.contentContainer}>
+          <View style={styles.headerContainer}>
+            {displayFavoriteImage()}
+            <Text style={styles.titleText}>{film.title}</Text>
+            <Text style={styles.voteText}>{film.vote_average}</Text>
+          </View>
+          <View style={styles.descriptionContainer}>
+            <Text style={styles.descriptionText} numberOfLines={6}>{film.overview}</Text>
+          </View>
+          <View style={styles.dateContainer}>
+            <Text style={styles.dateText}>Sorti le {film.release_date}</Text>
+          </View>
         </View>
-        <View style={styles.descriptionContainer}>
-          <Text style={styles.descriptionText} numberOfLines={6}>{film.overview}</Text>
-        </View>
-        <View style={styles.dateContainer}>
-          <Text style={styles.dateText}>Sorti le {film.release_date}</Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
+    </FadeIn>
   );
 };
 

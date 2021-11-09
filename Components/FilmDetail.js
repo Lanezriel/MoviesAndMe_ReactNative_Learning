@@ -17,6 +17,7 @@ import numeral from 'numeral';
 import { getFilmDetailsFromApi, getImageFromApi } from '../API/TMDBApi';
 import ic_favorite from '../Images/ic_favorite.png';
 import ic_favorite_border from '../Images/ic_favorite_border.png';
+import EnlargeShrink from '../Animations/EnlargeShrink';
 
 function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
   const { idFilm } = route.params;
@@ -66,11 +67,20 @@ function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
   };
 
   const displayFavoriteImage = () => {
+    let srcImage = ic_favorite_border;
+    let shouldEnlarge = false;
+
+    if (favoritesFilm.findIndex(f => f.id === film.id) !== -1) {
+      srcImage = ic_favorite;
+      shouldEnlarge = true;
+    }
     return (
-      <Image
-        style={styles.favoriteImage}
-        source={favoritesFilm.findIndex(f => f.id === film.id) !== -1 ? ic_favorite : ic_favorite_border}
-      />
+      <EnlargeShrink shouldEnlarge={shouldEnlarge}>
+        <Image
+          style={styles.favoriteImage}
+          source={srcImage}
+        />
+      </EnlargeShrink>
     )
   };
 
@@ -180,8 +190,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   favoriteImage: {
-    width: 40,
-    height: 40,
+    flex: 1,
+    width: null,
+    height: null,
   },
   description: {
     fontStyle: 'italic',
