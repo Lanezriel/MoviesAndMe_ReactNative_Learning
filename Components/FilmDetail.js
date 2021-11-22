@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Share,
   Platform,
+  Button,
 } from 'react-native';
 import moment from 'moment';
 import numeral from 'numeral';
@@ -19,15 +20,17 @@ import ic_favorite from '../Images/ic_favorite.png';
 import ic_favorite_border from '../Images/ic_favorite_border.png';
 import EnlargeShrink from '../Animations/EnlargeShrink';
 
-function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
+function FilmDetail({ navigation, route, dispatch, favoritesFilm, seenFilms }) {
   const { idFilm } = route.params;
 
   const [film, setFilm] = useState(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    console.log(idFilm);
     const fav = favoritesFilm.find(f => f.id === idFilm);
-    if (fav === undefined) {
+    const seen = seenFilms.find(f => f.id === idFilm);
+    if (fav === undefined && seen === undefined) {
       getFilmDetailsFromApi(idFilm)
         .then(data => {
           setFilm(data);
@@ -35,7 +38,7 @@ function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
         });
     }
     else {
-      setFilm(fav);
+      setFilm(fav || seen);
       setIsLoading(false);
     }
   }, []);
@@ -86,6 +89,11 @@ function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
 
   const toggleFavorite = () => {
     const action = { type: 'TOGGLE_FAVORITE', value: film };
+    dispatch(action);
+  };
+
+  const toggleSeenFilm = () => {
+    const action = { type: 'TOGGLE_SEEN_FILM', value: film };
     dispatch(action);
   };
 
@@ -146,11 +154,20 @@ function FilmDetail({ navigation, route, dispatch, favoritesFilm }) {
     }
   };
 
+  const displayFilmSeenButton = () => {
+    if (film !== undefined) {
+      return <Button onPress={toggleSeenFilm}
+        title={seenFilms.findIndex(f => f.id === film.id) === -1 ? 'Marquer comme vu' : 'Non vu' }
+      />
+    }
+  };
+
   return (
     <View style={styles.mainContainer}>
       {displayLoading()}
       {displayFilm()}
       {displayFloatingActionButton()}
+      {displayFilmSeenButton()}
     </View>
   );
 }
@@ -227,7 +244,8 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = (state) => {
   return {
-    favoritesFilm: state.toggleFavorite.favoritesFilm
+    favoritesFilm: state.toggleFavorite.favoritesFilm,
+    seenFilms: state.toggleSeenFilm.seenFilms,
   };
 };
 
